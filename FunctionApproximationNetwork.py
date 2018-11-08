@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 # torch.manual_seed(1)    # reproducible
 
-x = torch.unsqueeze(torch.linspace(0, 6, 200), dim=1)  # x data (tensor), shape=(100, 1)
-y = numpy.sin(x) + 0.2*torch.rand(x.size())                 # noisy y data (tensor), shape=(100, 1)
+x = torch.unsqueeze(torch.linspace(-1, 1, 200), dim=1)  # x data (tensor), shape=(100, 1)
+y = numpy.sin(5*x) + 0.2*torch.rand(x.size())                 # noisy y data (tensor), shape=(100, 1)
 
 # torch can only train on Variable, so convert them to Variable
 # The code below is deprecated in Pytorch 0.4. Now, autograd directly supports tensors
@@ -39,13 +39,13 @@ class Net(torch.nn.Module):
 net = Net(n_feature=1, n_hidden=50, n_output=1)     # define the network
 print(net)  # net architecture
 
-optimizer = torch.optim.SGD(net.parameters(), lr=0.08, momentum = 0.7) #Use stochastic gradient descent
+optimizer = torch.optim.SGD(net.parameters(), lr=0.1, momentum = 0.7) #Use stochastic gradient descent
 loss_func = torch.nn.MSELoss()  # this is for regression mean squared loss
 
 plt.ion()   # turn interactive plotting on
 
 #Cycle through data 200 times for SGD
-for t in range(800):
+for t in range(300):
     prediction = net(x)     # input x and predict based on x
 
     loss = loss_func(prediction, y)     # must be (1. nn output, 2. target)
@@ -59,7 +59,7 @@ for t in range(800):
         plt.cla()
         plt.scatter(x.data.numpy(), y.data.numpy())
         plt.plot(x.data.numpy(), prediction.data.numpy(), 'r-', lw=5)
-        plt.text(3.1, 0.5, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color':  'red'})
+        plt.text(0, 0.5, 'Loss=%.6f' % loss.data.numpy(), fontdict={'size': 20, 'color':  'red'})
         plt.pause(0.1)
 
 plt.ioff()
