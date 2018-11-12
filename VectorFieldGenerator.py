@@ -7,12 +7,39 @@ Created on Thu Nov  8 18:47:26 2018
 """
 import matplotlib.pyplot as plt
 import numpy as np
+import random
+import pickle
+import csv
 
-x = np.linspace(-1,1,50)
-y = np.linspace(-1,1,50)
+n = 64
+x = np.linspace(-1,1,n)
+y = np.linspace(-1,1,n)
 X, Y = np.meshgrid(x,y)
-Vx = np.cos(10*Y*Y*Y)#2*np.sin(5*Y)
-Vy = np.sin(5*X)
+
+
+
+for i in range(2):
+#    file_name = "./data/div_free_" + str(i).zfill(4) + ".csv"
+   s = np.random.uniform(0,3,8)
+   Vx = s[0]*np.cos(np.pi*Y) + s[1]*Y + s[2]*np.sin(np.pi*Y) + s[3]*np.exp(Y)/np.e
+   Vy = s[4]*np.cos(np.pi*X) + s[5]*X + s[6]*np.sin(np.pi*X) + s[7]*np.exp(X)/np.e
+   with open('./data/div_free_' + str(i).zfill(4) + '.txt', 'wb') as fp:
+       pickle.dump(X, fp)
+       pickle.dump(Y, fp)
+       pickle.dump(Vx, fp)
+       pickle.dump(Vy, fp)
+
+with open ('./data/div_free_0000.txt', 'rb') as fp:
+    matrix = pickle.load(fp)
+import pdb; pdb.set_trace()
+#   with open(file_name,"w+") as my_csv:
+#      csvWriter = csv.writer(my_csv,delimiter=',')
+#     csvWriter.writerows(Vx)
+#    csvWriter.writerows("\n")
+#   csvWriter.writerows(Vy)
+
+
+
 
 """
 for i in range(2):
@@ -54,4 +81,4 @@ qk = plt.quiverkey(Q, 0.9, 0.9, 1, r'$1 \frac{m}{s}$', labelpos='E',
                    coordinates='figure')
 plt.scatter(X, Y, color='k', s=5)
 """
-plt.show()
+#plt.show()
