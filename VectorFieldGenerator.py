@@ -19,24 +19,24 @@ X, Y = np.meshgrid(x,y)
 
 
 for i in range(2):
-#    file_name = "./data/div_free_" + str(i).zfill(4) + ".csv"
-   s = np.random.uniform(0,3,8)
-   Vx = s[0]*np.cos(np.pi*Y) + s[1]*Y + s[2]*np.sin(np.pi*Y) + s[3]*np.exp(Y)/np.e
-   Vy = s[4]*np.cos(np.pi*X) + s[5]*X + s[6]*np.sin(np.pi*X) + s[7]*np.exp(X)/np.e
-   with open('./data/div_free_' + str(i).zfill(4) + '.txt', 'wb') as fp:
-       pickle.dump(X, fp)
-       pickle.dump(Y, fp)
-       pickle.dump(Vx, fp)
-       pickle.dump(Vy, fp)
+    file_name = "./data/div_free_" + str(i).zfill(4) + ".csv"
+s = np.random.uniform(0,3,8)
+Vx = s[0]*np.cos(np.pi*Y) + s[1]*Y + s[2]*np.sin(np.pi*Y) + s[3]*np.exp(Y)/np.e
+Vy = s[4]*np.cos(np.pi*X) + s[5]*X + s[6]*np.sin(np.pi*X) + s[7]*np.exp(X)/np.e
+   #with open('./data/div_free_' + str(i).zfill(4) + '.txt', 'wb') as fp:
+   #    pickle.dump(X, fp)
+   #    pickle.dump(Y, fp)
+   #    pickle.dump(Vx, fp)
+   #    pickle.dump(Vy, fp)
 
-with open ('./data/div_free_0000.txt', 'rb') as fp:
-    matrix = pickle.load(fp)
-import pdb; pdb.set_trace()
-#   with open(file_name,"w+") as my_csv:
-#      csvWriter = csv.writer(my_csv,delimiter=',')
-#     csvWriter.writerows(Vx)
-#    csvWriter.writerows("\n")
-#   csvWriter.writerows(Vy)
+#with open ('./data/div_free_0000.txt', 'rb') as fp:
+#    matrix = pickle.load(fp)
+#import pdb; pdb.set_trace()
+with open(file_name,"w+") as my_csv:
+    csvWriter = csv.writer(my_csv,delimiter=',')
+    csvWriter.writerows(Vx)
+    csvWriter.writerows("\n")
+    csvWriter.writerows(Vy)
 
 
 
@@ -63,7 +63,7 @@ qk = plt.quiverkey(Q, 0.9, 0.9, 2, r'$2 \frac{m}{s}$', labelpos='E',
 """
 
 plt.figure()
-plt.title("pivot='mid'; every third arrow; units='inches'")
+#plt.title("pivot='mid'; every third arrow; units='inches'")
 Q = plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
                pivot='mid', units='inches')
 qk = plt.quiverkey(Q, 0.9, 0.9, 1, r'$1 \frac{m}{s}$', labelpos='E',
