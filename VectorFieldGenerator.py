@@ -38,15 +38,16 @@ X, Y = np.meshgrid(x,y)
 import csv
 
 for i in range(10):
-    print(rd.random())
-
-for i in range(10):
     file_name = "./data/div_free_" + str(i).zfill(4) + ".csv"
     print(file_name)
     
 #    rd.seed(datetime.now())
-    Vx = rd.random()*np.cos(2*np.pi*Y) + rd.random()*Y + rd.random()*np.sin(np.pi*Y) + rd.random()*np.exp(Y)/np.e
-    Vy = rd.random()*np.cos(2*np.pi*X) + rd.random()*X + rd.random()*np.sin(np.pi*X) + rd.random()*np.exp(X)/np.e
+    
+#    coeff = np.random.rand(6)
+    Vx =  rd.random()*np.cos(2*np.pi*Y) + rd.random()*Y \
+        + rd.random()*np.sin(np.pi*Y) + rd.random()*np.exp(Y)/np.e
+    Vy =  rd.random()*np.cos(2*np.pi*X) + rd.random()*X \
+        + rd.random()*np.sin(np.pi*X) + rd.random()*np.exp(X)/np.e
     with open(file_name,"w+") as my_csv:
         csvWriter = csv.writer(my_csv,delimiter=',')
         csvWriter.writerows(Vx)
@@ -62,6 +63,37 @@ for i in range(10):
     #plt.scatter(X[::3, ::3], Y[::3, ::3], color='r', s=5)
     
     plt.show()
+    
+for i in range(10):
+    file_name = "./data/non_div_free_" + str(i).zfill(4) + ".csv"
+    print(file_name)
+    
+#    rd.seed(datetime.now())
+    
+    Vx =  rd.random()*np.cos(np.pi*Y*X) + rd.random()*np.sin(np.pi*Y*X) \
+        + rd.random()*X*Y + rd.random()*np.exp(X*Y)/np.e \
+        + rd.random()*np.exp(X-Y)/np.e
+    Vy =  rd.random()*np.cos(np.pi*Y*X) + rd.random()*np.sin(np.pi*Y*X) \
+        + rd.random()*X*Y + rd.random()*np.exp(X*Y)/np.e \
+        + rd.random()*np.exp(X-Y)/np.e
+        
+    with open(file_name,"w+") as my_csv:
+        csvWriter = csv.writer(my_csv,delimiter=',')
+        csvWriter.writerows(Vx)
+        csvWriter.writerows("\n")
+        csvWriter.writerows(Vy)
+        
+    plt.figure()
+    plt.title("pivot='mid'; every third arrow; units='inches'")
+    Q = plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
+                   pivot='mid', units='inches')
+    qk = plt.quiverkey(Q, 0.9, 0.9, 1, r'$1 \frac{m}{s}$', labelpos='E',
+                       coordinates='figure')
+    #plt.scatter(X[::3, ::3], Y[::3, ::3], color='r', s=5)
+    
+    plt.show()    
+        
+        
 
 # test: load data
 print("TESTING...")
