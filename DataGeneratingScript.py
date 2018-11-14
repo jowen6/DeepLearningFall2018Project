@@ -6,16 +6,25 @@ Created on Mon Nov 12 22:10:57 2018
 @author: justinowen
 """
 
-import VFields as vf
+import Vfields as vf
 
-NumVecFields = 2
+NumVecFields = 100
 
-vf.DivFreeMake(NumVecFields)
+#Generating vector fields
+Data, Classification = vf.GenerateFieldDataset(NumVecFields)
 
-vf.NonDivFreeMake(NumVecFields)
+#Saving Data
+vf.SaveFieldDataset(Data,"Dataset_1.txt")
+vf.SaveFieldDataset(Classification,"Classification_1.txt")
 
-Vx,Vy = vf.LoadFieldData("div_free", 1)
-vf.PlotField(Vx,Vy)
+#Deleting data
+del Data, Classification
 
-Vx,Vy = vf.LoadFieldData("non_div_free", 1)
-vf.PlotField(Vx,Vy)
+#Loading saved data
+Data1 = vf.LoadFieldDataset("Dataset_1.txt")
+Classification1 = vf.LoadFieldDataset("Classification_1.txt")
+
+#Plot an example from the dataset
+vf.PlotField(Data1[100])
+
+
