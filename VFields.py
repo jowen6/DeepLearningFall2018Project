@@ -40,6 +40,7 @@ def DivFreeMake(NumberOfFields):
         
         #Add Classification to NN Output List
         DivFreeClassification.append(np.array([0])) 
+        #DivFreeClassification.append(0) 
         
     return DivFreeDataset, DivFreeClassification
 
@@ -66,7 +67,7 @@ def NonDivFreeMake(NumberOfFields):
         
         #Add Classification to NN Output List
         NonDivFreeClassification.append(np.array([1])) 
-        
+        #NonDivFreeClassification.append(1)
     return NonDivFreeDataset, NonDivFreeClassification
 
 
