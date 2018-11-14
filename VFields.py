@@ -50,7 +50,7 @@ def NonDivFreeMake(NumberOfFields):
     print("Generating non div free fields...")
     NonDivFreeDataset = []
     NonDivFreeClassification = []
-    for i in range(NumberOfFields):
+    for i in range(NumberOfFields*2):
         
         # x field components with random coefficients    
         Vx =  rd.uniform(-1,1)*np.cos(np.pi*Y*X) + rd.uniform(-1,1)*np.sin(np.pi*Y*X) \

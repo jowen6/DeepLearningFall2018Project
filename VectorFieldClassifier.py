@@ -24,143 +24,156 @@ import VFields as vf
 import torch.utils.data as utils
 
 #Number of each type of vector field (make divisible by 2)
-NumTrainVecFields = 400 #Will create twice this number of samples 
-NumTestVecFields = 26   #Will create twice this number of samples
+NumTrainVecFields = 30 #Will create twice this number of samples 
+NumTestVecFields = 50   #Will create twice this number of samples
 
-
-#Generating vector fields
-TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
-TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
-
-
-#Saving Data
-vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
-vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
-
-vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
-vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
-
-
-#Transform to torch tensors
-tensor_TrainData = torch.stack([torch.Tensor(i) for i in TrainData]) 
-#torch.LongTensor(TrainDataClassification)
-tensor_TrainDataClassification = torch.stack([torch.LongTensor(i) for i in TrainDataClassification])
-
-
-tensor_TestData = torch.stack([torch.Tensor(i) for i in TestData]) 
-#torch.LongTensor(TestDataClassification)
-tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in TestDataClassification])
-
-
-#Create dataset
-FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1)) 
-FieldTestDataset = utils.TensorDataset(tensor_TestData, tensor_TestDataClassification.view(-1)) 
-
-
-# create dataloader
-FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2) 
-FieldTestDataloader = utils.DataLoader(FieldTestDataset, batch_size=4, shuffle=False, num_workers=2)
-
-
-classes = ('DivFree', 'NotDivFree')
-
-
-########################################################################
-# 2. Define a Convolution Neural Network <3<3<3
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# Using the neural network from the PyTorch Neural Networks tutorial modified to
-# take 2-channel images (1 channel per 2D vector component).
-
-# I have some concerns that our vector fields may have a different variation
-# of values per pixel and this may screw things up.
-import torch.nn as nn
-import torch.nn.functional as F
-
-
-class Net(nn.Module):
-    def __init__(self):
-        super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(2, 6, 5) #2 inputs, 6 outputs, 5x5 convolution window
-        self.pool = nn.MaxPool2d(2, 2)  #2x2 non-overlapping window that takes max in window
-        self.conv2 = nn.Conv2d(6, 16, 5)    #6 inputs, 16 outputs, 5x5 convolution window
-        self.fc1 = nn.Linear(16 * 13 * 13, 120) #16*5*5 inputs, 120 outputs
-        self.fc2 = nn.Linear(120, 84)   #120 inputs, 84 outputs
-        self.fc3 = nn.Linear(84, 2)    #84 inputs, 10 outputs
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))    #Convolution->ReLU->Pooling
-        x = self.pool(F.relu(self.conv2(x)))    #Convolution->ReLU->Pooling
-        #print(x.size())
-        x = x.view(-1, 16 * 13 * 13)  #Convert all 2D arrays to 1D arrays
-        x = F.relu(self.fc1(x))     #New layer
-        x = F.relu(self.fc2(x))     #New layer
-        x = self.fc3(x)             #Output layer
-        return x
-
-
-net = Net()
-
-########################################################################
-# 3. Define a Loss function and optimizer  <3<3<3
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# Classification Cross-Entropy loss and SGD with momentum are the standard for
-# classifiaction problems.
-
-import torch.optim as optim
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
-########################################################################
-# 4. Train the network  <3<3<3
-# ^^^^^^^^^^^^^^^^^^^^
-#
-# This is when things start to get interesting.
-# We simply have to loop over our data iterator, and feed the inputs to the
-# network and optimize.
-
-for epoch in range(2):  # loop over the dataset multiple times
-
-    running_loss = 0.0
-    for i, data in enumerate(FieldTrainDataloader, 0):
-        # get the inputs
-        inputs, labels = data
-
+def my_classifier(NumSimulations):
+    for idx in range(NumSimulations):
         
-        # zero the parameter gradients
-        optimizer.zero_grad()
-
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-
-        # print statistics
-        running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
+        print("==================================================== \n")
+        
+        #Generating vector fields
+        TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
+        TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
+        
+        
+        #Saving Data
+        vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
+        vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
+        
+        vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
+        vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
+        
+        
+        #Transform to torch tensors
+        tensor_TrainData = torch.stack([torch.Tensor(i) for i in TrainData]) 
+        #torch.LongTensor(TrainDataClassification)
+        tensor_TrainDataClassification = torch.stack([torch.LongTensor(i) for i in TrainDataClassification])
+        
+        
+        tensor_TestData = torch.stack([torch.Tensor(i) for i in TestData]) 
+        #torch.LongTensor(TestDataClassification)
+        tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in TestDataClassification])
+        
+        
+        #Create dataset
+        FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1)) 
+        FieldTestDataset = utils.TensorDataset(tensor_TestData, tensor_TestDataClassification.view(-1)) 
+        
+        
+        # create dataloader
+        FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2) 
+        FieldTestDataloader = utils.DataLoader(FieldTestDataset, batch_size=4, shuffle=False, num_workers=2)
+        
+        
+        classes = ('DivFree', 'NotDivFree')
+        
+        
+        ########################################################################
+        # 2. Define a Convolution Neural Network <3<3<3
+        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # Using the neural network from the PyTorch Neural Networks tutorial modified to
+        # take 2-channel images (1 channel per 2D vector component).
+        
+        # I have some concerns that our vector fields may have a different variation
+        # of values per pixel and this may screw things up.
+        import torch.nn as nn
+        import torch.nn.functional as F
+        
+        
+        class Net(nn.Module):
+            def __init__(self):
+                super(Net, self).__init__()
+                self.conv1 = nn.Conv2d(2, 6, 5) #2 inputs, 6 outputs, 5x5 convolution window
+                self.pool = nn.MaxPool2d(2, 2)  #2x2 non-overlapping window that takes max in window
+                self.conv2 = nn.Conv2d(6, 16, 5)    #6 inputs, 16 outputs, 5x5 convolution window
+                self.fc1 = nn.Linear(16 * 13 * 13, 120) #16*5*5 inputs, 120 outputs
+                self.fc2 = nn.Linear(120, 84)   #120 inputs, 84 outputs
+                self.fc3 = nn.Linear(84, 2)    #84 inputs, 2 outputs
+        
+            def forward(self, x):
+                x = self.pool(F.relu(self.conv1(x)))    #Convolution->ReLU->Pooling
+                x = self.pool(F.relu(self.conv2(x)))    #Convolution->ReLU->Pooling
+                #print(x.size())
+                x = x.view(-1, 16 * 13 * 13)  #Convert all 2D arrays to 1D arrays
+                x = F.relu(self.fc1(x))     #New layer
+                x = F.relu(self.fc2(x))     #New layer
+                x = self.fc3(x)             #Output layer
+#                x = F.softmax(x)
+                return x
+        
+        
+        net = Net()
+        
+        ########################################################################
+        # 3. Define a Loss function and optimizer  <3<3<3
+        # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # Classification Cross-Entropy loss and SGD with momentum are the standard for
+        # classifiaction problems.
+        
+        import torch.optim as optim
+        
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+        
+        ########################################################################
+        # 4. Train the network  <3<3<3
+        # ^^^^^^^^^^^^^^^^^^^^
+        #
+        # This is when things start to get interesting.
+        # We simply have to loop over our data iterator, and feed the inputs to the
+        # network and optimize.
+        
+        for epoch in range(2):  # loop over the dataset multiple times
+        
             running_loss = 0.0
-
-print('Finished Training')
-
-########################################################################
-# 4. Test the network   <3<3<3
-# ^^^^^^^^^^^^^^^^^^^^
-# Let's look at how the network performs on the test dataset.
-
-correct = 0
-total = 0
-with torch.no_grad():
-    for data in FieldTestDataloader:
-        inouts, labels = data
-        print(labels)
-        outputs = net(inputs)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-
-print('Accuracy of the network on the 52 test Fields: %d %%' % (
-    100 * correct / total))
-########################################################################
+            for i, data in enumerate(FieldTrainDataloader, 0):
+                # get the inputs
+                inputs, labels = data
+        
+                
+                # zero the parameter gradients
+                optimizer.zero_grad()
+        
+                # forward + backward + optimize
+                outputs = net(inputs)
+                loss = criterion(outputs, labels)
+                loss.backward()
+                optimizer.step()
+        
+                # print statistics
+                running_loss += loss.item()
+                if i % 2000 == 1999:    # print every 2000 mini-batches
+                    print('[%d, %5d] loss: %.3f' %
+                          (epoch + 1, i + 1, running_loss / 2000))
+                    running_loss = 0.0
+        print('Finished Training')
+        
+        ########################################################################
+        # 4. Test the network   <3<3<3
+        # ^^^^^^^^^^^^^^^^^^^^
+        # Let's look at how the network performs on the test dataset.
+        
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for data in FieldTestDataloader:
+                inputs, labels = data
+        #        print(labels)
+                outputs = net(inputs)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+        success_rate = correct / total
+        print('Accuracy of the network on the test Fields: %d %%' % (
+            100 * success_rate))
+        
+        filename = ("simulation_result_train_"
+                    + str(NumTrainVecFields)+"_test_"
+                    + str(NumTestVecFields)+".csv")
+        with open(filename,"a+") as my_csv:
+            my_csv.write(str(success_rate)+"\n")
+            
+        ########################################################################
+        
+        print(outputs)
