@@ -41,8 +41,8 @@ vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
 vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
 vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
 """
-#Load Data if available
 
+#Load Data if available
 TrainData = vf.LoadFieldDataset("TrainDataset_1.txt")
 TrainDataClassification = vf.LoadFieldDataset("TrainClassification_1.txt")
 
@@ -166,7 +166,7 @@ with torch.no_grad():
     for data in FieldTestDataloader:
         Testinputs, labels = data
         Testoutputs = net(Testinputs)
-        print(outputs)
+        #print(Testoutputs)
         _, predicted = torch.max(Testoutputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
