@@ -24,8 +24,14 @@ import VFields as vf
 import torch.utils.data as utils
 
 #Number of each type of vector field (make divisible by 2)
-NumTrainVecFields = 30 #Will create twice this number of samples 
-NumTestVecFields = 50   #Will create twice this number of samples
+NumTrainVecFields = 140 #Will create twice this number of samples 
+NumTestVecFields = 60   #Will create twice this number of samples
+
+TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
+        
+vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
+vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
+
 
 def my_classifier(NumSimulations):
     for idx in range(NumSimulations):
@@ -34,15 +40,12 @@ def my_classifier(NumSimulations):
         
         #Generating vector fields
         TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
-        TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
         
         
         #Saving Data
         vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
         vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
-        
-        vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
-        vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
+
         
         
         #Transform to torch tensors
@@ -99,7 +102,11 @@ def my_classifier(NumSimulations):
                 x = F.relu(self.fc1(x))     #New layer
                 x = F.relu(self.fc2(x))     #New layer
                 x = self.fc3(x)             #Output layer
-#                x = F.softmax(x)
+                print("results before softmax")
+                print(x)
+                x = F.softmax(x, dim=1)
+                print("results after softmax")
+                print(x)
                 return x
         
         
@@ -161,7 +168,11 @@ def my_classifier(NumSimulations):
                 inputs, labels = data
         #        print(labels)
                 outputs = net(inputs)
+                print("output:")
+                print(outputs)
                 _, predicted = torch.max(outputs.data, 1)
+                print("prediction:")
+                print(torch.max(outputs.data, 1))
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
         success_rate = correct / total
@@ -176,4 +187,4 @@ def my_classifier(NumSimulations):
             
         ########################################################################
         
-        print(outputs)
+        

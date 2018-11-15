@@ -8,7 +8,7 @@ Created on Wed Nov 14 12:12:15 2018
 
 import VectorFieldClassifier as vfc
 
-NumSimulations = 100
+NumSimulations = 1
 
 vfc.my_classifier(NumSimulations)
 
