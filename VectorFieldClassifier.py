@@ -34,11 +34,13 @@ TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
 secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
 
 #Saving Data
-vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
-vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
+#vf.SaveFieldDataset(TestData,"./data/TestDataset_1.txt")
+#vf.SaveFieldDataset(TestDataClassification,"./data/TestClassification_1.txt")
 
-vf.SaveFieldDataset(secondTestData,"TestDataset_2.txt")
-vf.SaveFieldDataset(secondTestDataClassification,"TestClassification_2.txt")
+
+# comment the above two lines if want to use the second set test data
+vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
+vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
 
 
 def my_classifier(NumTrainVecFields):
@@ -61,8 +63,8 @@ def my_classifier(NumTrainVecFields):
         
         
         #Saving Data
-        vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
-        vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
+        vf.SaveFieldDataset(TrainData,"./data/TrainDataset_1.txt")
+        vf.SaveFieldDataset(TrainDataClassification,"./data/TrainClassification_1.txt")
         
         #Transform to torch tensors
         tensor_TrainData = torch.stack([torch.Tensor(i) for i in TrainData]) 
@@ -176,11 +178,8 @@ def my_classifier(NumTrainVecFields):
         with torch.no_grad():
             for data in FieldTestDataloader:
                 inputs, labels = data
-        #        print(labels)
                 outputs = net(inputs)
                 _, predicted = torch.max(outputs.data, 1)
-#                print("prediction:")
-#                print(torch.max(outputs.data, 1))
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
         success_rate = correct / total
@@ -193,11 +192,12 @@ def my_classifier(NumTrainVecFields):
 #            my_csv.write(str(success_rate)+", ")
 #            my_csv.write(str((outputs[:,0]).numpy())+"\n")
 
-    with open("./results/success_rate.csv","a+") as write_data:
+
+    with open("./results/success_rate_2.csv","a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(average_success_rate) + "\n") 
            
-    with open("./results/confidence_rate.csv","a+") as write_data:
+    with open("./results/confidence_rate_2.csv","a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(confidenfe_rate[0])+ ", " 
                          + str(confidenfe_rate[1])+ ", " 
