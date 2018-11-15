@@ -32,7 +32,7 @@ NumTestVecFields = 200   #Will create twice this number of samples
 #Generating vector fields
 TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
 TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
-
+secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
 
 #Saving Data
 vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
@@ -41,13 +41,15 @@ vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
 vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
 vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
 
+vf.SaveFieldDataset(secondTestData,"TestDataset_2.txt")
+vf.SaveFieldDataset(secondTestDataClassification,"TestClassification_2.txt")
 
 #Load Data if available
 TrainData = vf.LoadFieldDataset("TrainDataset_1.txt")
 TrainDataClassification = vf.LoadFieldDataset("TrainClassification_1.txt")
 
-TestData = vf.LoadFieldDataset("TestDataset_1.txt")
-TestDataClassification = vf.LoadFieldDataset("TestClassification_1.txt")
+TestData = vf.LoadFieldDataset("TestDataset_2.txt")
+TestDataClassification = vf.LoadFieldDataset("TestClassification_2.txt")
 
 
 #Transform to torch tensors
