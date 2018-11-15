@@ -9,6 +9,22 @@ Created on Thu Nov  8 11:13:05 2018
 """
 Sections marked with "<3<3<3" are ones I'm happy with for now.
 """
+
+"""
+Inputs:
+    NumTrainVecFields: an array of different number of the size of training set
+    NumTestVecFields:  an array of different number of the size of testing set
+    NumSimulations:    total number of independent simulations
+    isEnriched:        an indicator for whether using the 'secondTestData'
+                       True = enriched, False = not enriched
+    LearningRate:      the learning rate in SDG
+    
+Outputs:
+    success_rate_xxx_lr_xxx.csv:    success rate
+    confidence_rate_xxx_lr_xxx.csv: confidence rate
+    **The first xxx = isEnriched, second xxx = learning rate.
+"""
+
 #Need to normalize tensor data to reasonable range [-1,1].
 
 # -*- coding: utf-8 -*-
@@ -25,36 +41,33 @@ import VFields as vf
 import torch.utils.data as utils
 import numpy as np
 
-#Number of each type of vector field (make divisible by 2)
-NumSimulations = 10
-NumTestVecFields = 60   #Will create twice this number of samples
-LearningRate = 0.01
-
-
-
-def my_classifier(NumTrainVecFields, isEnriched):
+def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
+                  isEnriched, LearningRate):
     
+    # The testing data is generated once for all the simulations.
     TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
     secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
     
     if isEnriched == False:
-        #Saving Data
+        # Using the first type of testing data
         vf.SaveFieldDataset(TestData,"./data/TestDataset_1.txt")
         vf.SaveFieldDataset(TestDataClassification,"./data/TestClassification_1.txt")
     else:
-        # comment the above two lines if want to use the second set test data
+        # Using the second type of testing data
         vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
         vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
     
-    confidenfe_rate = np.zeros(4)
-    average_success_rate = 0
+    confidenfe_rate = np.zeros(4)   #stores the average condidence rate of the last batch
+    average_success_rate = 0        #stores the average success rate
     
     for idx in range(NumSimulations):
         print("==================================================== \n")
+
+        ########################################################################
+        # 2. Generate the Training Data Set <3<3<3
         
         #Generating vector fields
         TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
-        
         
         #Saving Data
         vf.SaveFieldDataset(TrainData,"./data/TrainDataset_1.txt")
@@ -68,7 +81,6 @@ def my_classifier(NumTrainVecFields, isEnriched):
         FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1)) 
         FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2) 
 
-        
         tensor_TestData = torch.stack([torch.Tensor(i) for i in TestData]) 
         #torch.LongTensor(TestDataClassification)
         tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in TestDataClassification])
@@ -78,8 +90,7 @@ def my_classifier(NumTrainVecFields, isEnriched):
         
         # create dataloader
         FieldTestDataloader = utils.DataLoader(FieldTestDataset, batch_size=4, shuffle=False, num_workers=2)
-        
-        
+                       
 #        classes = ('DivFree', 'NotDivFree')
         
         
@@ -112,9 +123,8 @@ def my_classifier(NumTrainVecFields, isEnriched):
                 x = F.relu(self.fc1(x))     #New layer
                 x = F.relu(self.fc2(x))     #New layer
                 x = self.fc3(x)             #Output layer
-                x = F.softmax(x, dim=1)
+                x = F.softmax(x, dim=1)     #Softmax the output
                 return x
-        
         
         net = Net()
         
@@ -179,26 +189,26 @@ def my_classifier(NumTrainVecFields, isEnriched):
         success_rate = correct / total
         print('Accuracy of the network on the test Fields: %d %%' % (
             100 * success_rate))
+        
         average_success_rate += success_rate/NumSimulations
         confidenfe_rate += (outputs[:,0]).numpy()/NumSimulations
                 
 #        with open(filename,"a+") as my_csv:
 #            my_csv.write(str(success_rate)+", ")
 #            my_csv.write(str((outputs[:,0]).numpy())+"\n")
-        ########################################################################
 
-
-    with open(("./results/success_rate_"+str(isEnriched)
+    ########################################################################
+    # 6. Output the data into csv files   <3<3<3
+    
+    with open(("./results/sr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(average_success_rate) + "\n") 
            
-    with open(("./results/confidence_rate_"+str(isEnriched)
+    with open(("./results/cr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(confidenfe_rate[0])+ ", " 
                          + str(confidenfe_rate[1])+ ", " 
                          + str(confidenfe_rate[2])+ ", " 
-                         + str(confidenfe_rate[3]) + "\n")      
-        
-        
+                         + str(confidenfe_rate[3]) + "\n")               

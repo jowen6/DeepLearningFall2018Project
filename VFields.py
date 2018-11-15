@@ -4,6 +4,9 @@
 Created on Tue Nov 13 17:05:41 2018
 
 @author: justinowen
+
+Generates the training data set and testing data set.
+Two types of testing data can be generated.
 """
 
 import matplotlib.pyplot as plt
