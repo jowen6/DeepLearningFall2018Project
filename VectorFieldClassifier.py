@@ -23,34 +23,28 @@ import torch
 
 import VFields as vf
 import torch.utils.data as utils
-import os
 import numpy as np
 
 #Number of each type of vector field (make divisible by 2)
 NumSimulations = 10
 NumTestVecFields = 60   #Will create twice this number of samples
-
-TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
-secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
-
-#Saving Data
-#vf.SaveFieldDataset(TestData,"./data/TestDataset_1.txt")
-#vf.SaveFieldDataset(TestDataClassification,"./data/TestClassification_1.txt")
+LearningRate = 0.01
 
 
-# comment the above two lines if want to use the second set test data
-vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
-vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
 
-
-def my_classifier(NumTrainVecFields):
-    filename = ("./results/simulation_result_train_"
-            + str(NumTrainVecFields)+"_test_"
-            + str(NumTestVecFields)+"_test_1.csv")
-    try:
-        os.remove(filename)
-    except OSError:
-        pass
+def my_classifier(NumTrainVecFields, isEnriched):
+    
+    TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
+    secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
+    
+    if isEnriched == False:
+        #Saving Data
+        vf.SaveFieldDataset(TestData,"./data/TestDataset_1.txt")
+        vf.SaveFieldDataset(TestDataClassification,"./data/TestClassification_1.txt")
+    else:
+        # comment the above two lines if want to use the second set test data
+        vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
+        vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
     
     confidenfe_rate = np.zeros(4)
     average_success_rate = 0
@@ -133,7 +127,7 @@ def my_classifier(NumTrainVecFields):
         import torch.optim as optim
         
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+        optimizer = optim.SGD(net.parameters(), lr=LearningRate, momentum=0.9)
         
         ########################################################################
         # 4. Train the network  <3<3<3
@@ -191,18 +185,20 @@ def my_classifier(NumTrainVecFields):
 #        with open(filename,"a+") as my_csv:
 #            my_csv.write(str(success_rate)+", ")
 #            my_csv.write(str((outputs[:,0]).numpy())+"\n")
+        ########################################################################
 
 
-    with open("./results/success_rate_2.csv","a+") as write_data:
+    with open(("./results/success_rate_"+str(isEnriched)
+    +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(average_success_rate) + "\n") 
            
-    with open("./results/confidence_rate_2.csv","a+") as write_data:
+    with open(("./results/confidence_rate_"+str(isEnriched)
+    +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(confidenfe_rate[0])+ ", " 
                          + str(confidenfe_rate[1])+ ", " 
                          + str(confidenfe_rate[2])+ ", " 
                          + str(confidenfe_rate[3]) + "\n")      
         
-        ########################################################################
         

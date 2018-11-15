@@ -8,7 +8,7 @@ Created on Wed Nov 14 12:12:15 2018
 
 import VectorFieldClassifier as vfc
 
-for NumTrainVecFields in range(10,500,10):
+for NumTrainVecFields in range(10,400,10):
     print('Running with trainning vector field size: %d ' % 
             NumTrainVecFields)
-    vfc.my_classifier(NumTrainVecFields)
+    vfc.my_classifier(NumTrainVecFields, True)
