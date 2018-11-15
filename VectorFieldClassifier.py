@@ -22,9 +22,10 @@ import torch
 
 import VFields as vf
 import torch.utils.data as utils
+import numpy as np        
 
 #Number of each type of vector field (make divisible by 2)
-NumTrainVecFields = 140 #Will create twice this number of samples 
+NumTrainVecFields = 100 #Will create twice this number of samples 
 NumTestVecFields = 60   #Will create twice this number of samples
 
 TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
@@ -172,7 +173,7 @@ def my_classifier(NumSimulations):
                 print(outputs)
                 _, predicted = torch.max(outputs.data, 1)
                 print("prediction:")
-                print(torch.max(outputs.data, 1))
+                print(predicted)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
         success_rate = correct / total
@@ -182,9 +183,11 @@ def my_classifier(NumSimulations):
         filename = ("simulation_result_train_"
                     + str(NumTrainVecFields)+"_test_"
                     + str(NumTestVecFields)+".csv")
+        outputs = outputs.view(1,4*2)
         with open(filename,"a+") as my_csv:
-            my_csv.write(str(success_rate)+"\n")
-            
+            my_csv.write(str(success_rate)+", ")
+            my_csv.write(str(outputs.numpy()))
+#            np.savetxt(outputs.numpy())
         ########################################################################
         
         
