@@ -6,7 +6,7 @@ Created on Mon Nov 12 22:10:57 2018
 @author: justinowen
 """
 
-import Vfields as vf
+import VFields as vf
 
 NumVecFields = 100
 

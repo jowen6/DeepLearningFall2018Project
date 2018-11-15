@@ -75,9 +75,13 @@ def GenerateFieldDataset(NumberOfEachField):
     print("Generating fields data...")
     DivFreeDataset, DivFreeClassification = DivFreeMake(NumberOfEachField)
     NonDivFreeDataset, NonDivFreeClassification = NonDivFreeMake(NumberOfEachField)
-    
     return DivFreeDataset+NonDivFreeDataset, DivFreeClassification+NonDivFreeClassification
 
+def secondGenerateFieldDataset(NumberOfEachField):
+    print("Generating second type fields data...")
+    secondDivFreeDataset, DivFreeClassification = second_DivFreeMake(NumberOfEachField)
+    NonDivFreeDataset, NonDivFreeClassification = NonDivFreeMake(NumberOfEachField)
+    return secondDivFreeDataset+NonDivFreeDataset, DivFreeClassification+NonDivFreeClassification
 
 def SaveFieldDataset(Dataset,file_name):
     #file_name = "test.txt" for example
@@ -104,3 +108,28 @@ def PlotField(V):
     plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
                    pivot='mid', units='inches')
     plt.show() 
+
+# Makes the div free vector fields and saves them
+def second_DivFreeMake(NumberOfFields):
+    print("Generating second type of div free fields...")
+    secondDivFreeDataset = []
+    DivFreeClassification = []
+    for i in range(NumberOfFields):
+        a = rd.random()
+        b = rd.random()
+        c = rd.random()
+        # x field components with random coefficients
+        Vx =  a*X*Y**2 + b*np.cos(X)*Y + c*np.exp(-y)*x**2
+        
+        # y field components with random coefficients   
+        Vy = a*(-Y**3/3.0) + b*1/2*Y**2*np.sin(X) + c*2*np.exp(-Y)*X
+
+        
+        #Add data to NN Inputs List
+        secondDivFreeDataset.append(np.array([Vx,Vy]))
+        
+        #Add Classification to NN Output List
+        DivFreeClassification.append(np.array([0])) 
+        #DivFreeClassification.append(0) 
+        
+    return secondDivFreeDataset, DivFreeClassification

@@ -9,6 +9,7 @@ Created on Thu Nov  8 11:13:05 2018
 """
 Sections marked with "<3<3<3" are ones I'm happy with for now.
 """
+#Need to normalize tensor data to reasonable range [-1,1].
 
 # -*- coding: utf-8 -*-
 
@@ -29,14 +30,18 @@ NumTrainVecFields = 100 #Will create twice this number of samples
 NumTestVecFields = 60   #Will create twice this number of samples
 
 TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
-        
+secondTestData, secondTestDataClassification = vf.secondGenerateFieldDataset(NumTestVecFields)
+
+#Saving Data
 vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
 vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
+
+vf.SaveFieldDataset(secondTestData,"TestDataset_2.txt")
+vf.SaveFieldDataset(secondTestDataClassification,"TestClassification_2.txt")
 
 
 def my_classifier(NumSimulations):
     for idx in range(NumSimulations):
-        
         print("==================================================== \n")
         
         #Generating vector fields
@@ -46,8 +51,6 @@ def my_classifier(NumSimulations):
         #Saving Data
         vf.SaveFieldDataset(TrainData,"TrainDataset_1.txt")
         vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
-
-        
         
         #Transform to torch tensors
         tensor_TrainData = torch.stack([torch.Tensor(i) for i in TrainData]) 
@@ -83,7 +86,6 @@ def my_classifier(NumSimulations):
         # of values per pixel and this may screw things up.
         import torch.nn as nn
         import torch.nn.functional as F
-        
         
         class Net(nn.Module):
             def __init__(self):
@@ -158,7 +160,7 @@ def my_classifier(NumSimulations):
         print('Finished Training')
         
         ########################################################################
-        # 4. Test the network   <3<3<3
+        # 5. Test the network   <3<3<3
         # ^^^^^^^^^^^^^^^^^^^^
         # Let's look at how the network performs on the test dataset.
         
@@ -189,5 +191,4 @@ def my_classifier(NumSimulations):
             my_csv.write(str(outputs.numpy()))
 #            np.savetxt(outputs.numpy())
         ########################################################################
-        
         
