@@ -104,3 +104,28 @@ def PlotField(V):
     plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
                    pivot='mid', units='inches')
     plt.show() 
+
+# Makes the div free vector fields and saves them
+def second_DivFreeMake(NumberOfFields):
+    print("Generating second type of div free fields...")
+    DivFreeDataset = []
+    DivFreeClassification = []
+    for i in range(NumberOfFields):
+        a = rd.random()
+        b = rd.random()
+        c = rd.random()
+        # x field components with random coefficients
+        Vx =  a*X*Y**2 + b*np.cos(X)*Y + c*np.exp(-y)*x**2
+        
+        # y field components with random coefficients   
+        Vy = a*(-Y**3/3.0) + b*1/2*Y**2*np.sin(X) + c*2*np.exp(-Y)*X
+
+        
+        #Add data to NN Inputs List
+        secondDivFreeDataset.append(np.array([Vx,Vy]))
+        
+        #Add Classification to NN Output List
+        secondDivFreeClassification.append(np.array([0])) 
+        #DivFreeClassification.append(0) 
+        
+    return secondDivFreeDataset, secondDivFreeClassification
