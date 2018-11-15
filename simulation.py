@@ -8,7 +8,6 @@ Created on Wed Nov 14 12:12:15 2018
 
 import VectorFieldClassifier as vfc
 
-NumSimulations = 1
-
-vfc.my_classifier(NumSimulations)
+for idx in [10]:#, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 300, 500]:
+    vfc.my_classifier(idx)
 

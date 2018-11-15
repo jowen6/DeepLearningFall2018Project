@@ -23,10 +23,11 @@ import torch
 
 import VFields as vf
 import torch.utils.data as utils
-import numpy as np        
+import os
+import numpy as np
 
 #Number of each type of vector field (make divisible by 2)
-NumTrainVecFields = 100 #Will create twice this number of samples 
+NumSimulations = 10
 NumTestVecFields = 60   #Will create twice this number of samples
 
 TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
@@ -40,7 +41,18 @@ vf.SaveFieldDataset(secondTestData,"TestDataset_2.txt")
 vf.SaveFieldDataset(secondTestDataClassification,"TestClassification_2.txt")
 
 
-def my_classifier(NumSimulations):
+def my_classifier(NumTrainVecFields):
+    filename = ("./results/simulation_result_train_"
+            + str(NumTrainVecFields)+"_test_"
+            + str(NumTestVecFields)+"_test_1.csv")
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    
+    confidenfe_rate = np.zeros(4)
+    average_success_rate = 0
+    
     for idx in range(NumSimulations):
         print("==================================================== \n")
         
@@ -57,23 +69,22 @@ def my_classifier(NumSimulations):
         #torch.LongTensor(TrainDataClassification)
         tensor_TrainDataClassification = torch.stack([torch.LongTensor(i) for i in TrainDataClassification])
         
+        FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1)) 
+        FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2) 
+
         
         tensor_TestData = torch.stack([torch.Tensor(i) for i in TestData]) 
         #torch.LongTensor(TestDataClassification)
         tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in TestDataClassification])
         
-        
         #Create dataset
-        FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1)) 
         FieldTestDataset = utils.TensorDataset(tensor_TestData, tensor_TestDataClassification.view(-1)) 
         
-        
         # create dataloader
-        FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2) 
         FieldTestDataloader = utils.DataLoader(FieldTestDataset, batch_size=4, shuffle=False, num_workers=2)
         
         
-        classes = ('DivFree', 'NotDivFree')
+#        classes = ('DivFree', 'NotDivFree')
         
         
         ########################################################################
@@ -105,11 +116,7 @@ def my_classifier(NumSimulations):
                 x = F.relu(self.fc1(x))     #New layer
                 x = F.relu(self.fc2(x))     #New layer
                 x = self.fc3(x)             #Output layer
-                print("results before softmax")
-                print(x)
                 x = F.softmax(x, dim=1)
-                print("results after softmax")
-                print(x)
                 return x
         
         
@@ -171,24 +178,31 @@ def my_classifier(NumSimulations):
                 inputs, labels = data
         #        print(labels)
                 outputs = net(inputs)
-                print("output:")
-                print(outputs)
                 _, predicted = torch.max(outputs.data, 1)
-                print("prediction:")
-                print(predicted)
+#                print("prediction:")
+#                print(torch.max(outputs.data, 1))
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
         success_rate = correct / total
         print('Accuracy of the network on the test Fields: %d %%' % (
             100 * success_rate))
+        average_success_rate += success_rate/NumSimulations
+        confidenfe_rate += (outputs[:,0]).numpy()/NumSimulations
+                
+#        with open(filename,"a+") as my_csv:
+#            my_csv.write(str(success_rate)+", ")
+#            my_csv.write(str((outputs[:,0]).numpy())+"\n")
+
+    with open("./results/success_rate.csv","a+") as write_data:
+        write_data.write(str(NumTrainVecFields) + ", " 
+                         + str(average_success_rate) + "\n") 
+           
+    with open("./results/confidence_rate.csv","a+") as write_data:
+        write_data.write(str(NumTrainVecFields) + ", " 
+                         + str(confidenfe_rate[0])+ ", " 
+                         + str(confidenfe_rate[1])+ ", " 
+                         + str(confidenfe_rate[2])+ ", " 
+                         + str(confidenfe_rate[3]) + "\n")      
         
-        filename = ("simulation_result_train_"
-                    + str(NumTrainVecFields)+"_test_"
-                    + str(NumTestVecFields)+".csv")
-        outputs = outputs.view(1,4*2)
-        with open(filename,"a+") as my_csv:
-            my_csv.write(str(success_rate)+", ")
-            my_csv.write(str(outputs.numpy()))
-#            np.savetxt(outputs.numpy())
         ########################################################################
         
