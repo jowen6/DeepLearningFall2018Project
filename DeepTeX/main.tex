@@ -1,0 +1,144 @@
+\documentclass[review,leqno]{siamart1116}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{newlfont}
+\usepackage{graphicx}
+\usepackage{color}  
+\usepackage{xspace}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{bm}
+\usepackage{multirow}
+\usepackage{mydef}
+\usepackage[numbers]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{fadings}
+\let\cite=\citet
+
+\newcommand{\eric}[1]{{\color{blue}#1}}
+\newcommand{\justin}[1]{{\color{violet}#1}}
+\newcommand{\peng}[1]{{\color{cyan}#1}} 
+
+\def\bF{\mathbf F}
+\def\bi{\mathbf i}
+\def\bj{\mathbf j}
+\def\bk{\mathbf k}
+
+\begin{document}
+
+\newcommand\footnotemarkfromtitle[1]{%
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}%
+\footnotemark[#1]%
+\renewcommand{\thefootnote}{\arabic{footnote}}}
+
+% Declare title and authors, without \thanks
+\newcommand{\TheTitle}{Using neural nets for identifying divergence free vector fields}
+
+\newcommand{\TheAuthors}{J.Owen, E. Tovar, P. Wei}
+
+% Sets running headers as well as PDF title and authors
+\headers{Convolutional neural networks}{\TheAuthors}
+
+% Title.
+\title{{\TheTitle}\thanks{Draft version, \today \funding{No funding was given for this project.}}}
+
+% Authors: full names plus addresses.
+\author{Justin Owen\footnotemark[3]
+%
+\and Eric Tovar\footnotemark[3] 
+%
+\and Peng Wei\footnotemark[3] 
+% the names are in alphabetical order
+}
+
+\maketitle
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}} 
+
+%\footnotetext[2]{ERDC.}
+
+\footnotetext[3]{Department of Mathematics, Texas A\&M University 3368
+  TAMU, College Station, TX 77843, USA.}
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+
+\begin{abstract}
+  We investigate the use of convolutional neural networks for identifying globally divergence-free vector fields. We show that network architectures used in image classification can be repurposed for identifying globally divergence free vector fields defined on the domain $[-1,1]\times[-1,1]$.
+  \end{abstract}
+
+\begin{keywords}
+  Neural networks, Deep learning, Convolution Neural Nets, Divergence Free Flows. 
+\end{keywords}
+
+\begin{AMS}
+62M45, 62M40, 37C10
+\end{AMS}
+
+\section{Introduction}
+% recall to cite use \cite{}
+
+Machine learning for scientific computing has gained massive attraction 
+from researchers across disciplines. 
+In \cite{RPK2017a,RPK2017b} a physics informed neural network was constructed 
+to tackle data-driven solutions and data-driven discovery of nonlinear 
+partial differential equations.
+\cite{MST2017} trained a deep convolutional network to predict the ground state energy, kinetic energy, and the first excited-state energy of an electron.
+
+
+Given a continuously differentiable vector field 
+$\bF = u(x,y)\bi + v(x,y)\bj$, 
+the divergence of $\bF$ is a scalar-valued function defined by
+\[\nabla \cdot \bF = \frac{\partial u}{\partial x} 
++ \frac{\partial v}{\partial y}.\]
+We say a vector field is divergence free if $\nabla \cdot \bF = 0$.
+In practice, a divergence free vector field implies that the fluid is incompressible. 
+Namely, the mass is conserved in $\Omega$ throughout the time. 
+Due to such property, the divergence-free vector field is ubiquitous 
+in physics, fluid dynamics, geophysics, among others.
+To name a few, the magnetic field, the electric field in free space, most familiar liquids, 
+and perfect gas are all incompressible. \justin{Given the ubiquity of divergence free vector fields we seek to answer the following question: given a vector field, can a neural net identify if it is divergence free?} We will try to answer the question with the use of convolutional neural nets.
+
+The vector field shares some similarity with the image processing. \eric{Maybe give some more info on the RBG color model? I'm not sure. Or maybe say Red Blue Green (RGC) color model}
+In RGB color model, the image is represented by a RGB triplet at each pixel.
+In addition, the nearby pixels are more highly correlated than the far away pixels. We consider vector fields defined on a fixed domain \justin{$\Omega:=[-1,1]\times[-1,1] \subset \mathbb{R}^2$ and the domain is discretized into a uniform grid.} The vector field can then be approximately represented by storing a rank 3 tensor,
+with two dimensions representing the spatial location, 
+and one dimension storing the vector value. Moreover, whenever the vector field is continuous, the values are highly correlated in a small neighbourhood. 
+Consequently, there is a hope that by training the neural nets with a similar methodology,
+we can come up with a vector field classifier.
+
+This paper is organized as follows.
+In section 2, we introduce the families of divergence free and non divergence free vector fields, and use these families of functions as basis to generate our training data set as well as the testing data set.
+In section 3, we define our convolutional neural network together with the loss function.
+The simulation results are presented in section 4.
+We end our paper with conclusions and possible extensions in section 5.
+
+All code and data sets justifying this manuscript can be found at
+\url{https://github.com/jowen6/DeepLearningFall2018Project}.
+
+\peng{
+Another paper by Brown group:
+A deep convolutional neural network for
+classification of red blood cells in sickle cell
+anemia
+\url{https://journals.plos.org/ploscompbiol/article/file?id=10.1371/journal.pcbi.1005746&type=printable}
+}
+
+
+%%%% import files here %%%%%
+\input{data_generation.tex}
+\input{neural_net.tex}
+\input{results.tex}
+\input{conclusion.tex}
+%%%% import files here %%%%%
+
+\bibliographystyle{abbrvnat} 
+\bibliography{ref}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% mode: flyspell
+%%% TeX-master: t
+%%% End: 
