@@ -31,12 +31,12 @@ def DivFreeMake(NumberOfFields):
     for i in range(NumberOfFields):
 
         # x field components with random coefficients
-        Vx =  rd.random()*np.cos(2*np.pi*Y) + rd.random()*Y \
-            + rd.random()*np.sin(np.pi*Y) + rd.random()*np.exp(Y)/np.e
+        Vx =  rd.uniform(-1,1)*np.cos(2*np.pi*Y) + rd.uniform(-1,1)*Y \
+            + rd.uniform(-1,1)*np.sin(np.pi*Y) + rd.uniform(-1,1)*np.exp(Y)/np.e
 
         # y field components with random coefficients
-        Vy =  rd.random()*np.cos(2*np.pi*X) + rd.random()*X \
-            + rd.random()*np.sin(np.pi*X) + rd.random()*np.exp(X)/np.e
+        Vy =  rd.uniform(-1,1)*np.cos(2*np.pi*X) + rd.uniform(-1,1)*X \
+            + rd.uniform(-1,1)*np.sin(np.pi*X) + rd.uniform(-1,1)*np.exp(X)/np.e
 
         #Add data to NN Inputs List
         DivFreeDataset.append(np.array([Vx,Vy]))
@@ -112,8 +112,12 @@ def PlotField(V):
     plt.figure()
 
     #quiver command gives cool arrows
-    plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
-                   pivot='mid', units='inches')
+    # plt.quiver(X[::3, ::3], Y[::3, ::3], Vx[::3, ::3], Vy[::3, ::3],
+    #                pivot='mid', units='inches')
+    plt.quiver(X[::2, ::2], Y[::2, ::2], Vx[::2, ::2], Vy[::2, ::2],\
+        pivot='mid', units='inches')
+    plt.savefig('second_non_div_free.eps', format='eps', dpi=600)
+
     plt.show()
 # Makes the second non div free vector fields and saves them
 def second_NonDivFreeMake(NumberOfFields):
@@ -123,7 +127,7 @@ def second_NonDivFreeMake(NumberOfFields):
     for i in range(NumberOfFields*2):
         # x field components with random coefficients
         Vx =  rd.uniform(-1,1)*np.cos(rd.uniform(-1,1)*np.pi*X)*Y**2 * \
-        np.sin(y) + rd.uniform(-1,1)* X**2 * Y**2
+        np.sin(Y) + rd.uniform(-1,1)* X**2 * Y**2
         # y field components with random coefficients
         Vy =  np.sqrt(np.exp(X*Y**2))*np.cos(X*Y)
         #Add data to NN Inputs List
@@ -139,11 +143,11 @@ def second_DivFreeMake(NumberOfFields):
     secondDivFreeDataset = []
     DivFreeClassification = []
     for i in range(NumberOfFields):
-        a = rd.random()
-        b = rd.random()
-        c = rd.random()
+        a = rd.uniform(-1,1)
+        b = rd.uniform(-1,1)
+        c = rd.uniform(-1,1)
         # x field components with random coefficients
-        Vx =  a*X*Y**2 + b*np.cos(X)*Y + c*np.exp(-y)*x**2
+        Vx =  a*X*Y**2 + b*np.cos(X)*Y + c*np.exp(-Y)*X**2
         # y field components with random coefficients
         Vy = a*(-Y**3/3.0) + b*1/2*Y**2*np.sin(X) + c*2*np.exp(-Y)*X
         #Add data to NN Inputs List
@@ -159,11 +163,11 @@ def third_DivFreeMake(NumberOfFields):
         thirdDivFreeDataset = []
         DivFreeClassification = []
         for i in range(NumberOfFields):
-            a = 32
+            a = 4
             # x field components with random coefficients
-            Vx =  np.sin(a*Y)
+            Vx =  rd.uniform(-1,1)*np.sin(a*Y)
             # y field components with random coefficients
-            Vy = np.cos(a*X)
+            Vy = rd.uniform(-1,1)*np.cos(a*X)
             #Add data to NN Inputs List
             thirdDivFreeDataset.append(np.array([Vx,Vy]))
             #Add Classification to NN Output List
@@ -178,11 +182,11 @@ def fourth_DivFreeMake(NumberOfFields):
         fourthDivFreeDataset = []
         DivFreeClassification = []
         for i in range(NumberOfFields):
-            a = 1/32
+            a = 1/4
             # x field components with random coefficients
-            Vx =  np.sin(a*Y)
+            Vx =  rd.uniform(-1,1)*np.sin(a*Y)
             # y field components with random coefficients
-            Vy = np.cos(a*X)
+            Vy = rd.uniform(-1,1)*np.cos(a*X)
             #Add data to NN Inputs List
             fourthDivFreeDataset.append(np.array([Vx,Vy]))
             #Add Classification to NN Output List

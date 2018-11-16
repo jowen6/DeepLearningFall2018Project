@@ -54,6 +54,10 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
         vf.SaveFieldDataset(TestDataClassification,"./data/TestClassification_1.txt")
     else:
         # Using the second type of testing data
+        # import pdb; pdb.set_trace()
+        # print(np.shape(secondTestData))
+        # vf.PlotField(secondTestData[350])
+        # pdb.set_trace()
         vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
         vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
 
@@ -81,9 +85,9 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
         FieldTrainDataset = utils.TensorDataset(tensor_TrainData, tensor_TrainDataClassification.view(-1))
         FieldTrainDataloader = utils.DataLoader(FieldTrainDataset, batch_size=4, shuffle=True, num_workers=2)
 
-        tensor_TestData = torch.stack([torch.Tensor(i) for i in TestData])
+        tensor_TestData = torch.stack([torch.Tensor(i) for i in secondTestData])
         #torch.LongTensor(TestDataClassification)
-        tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in TestDataClassification])
+        tensor_TestDataClassification = torch.stack([torch.LongTensor(i) for i in secondTestDataClassification])
 
         #Create dataset
         FieldTestDataset = utils.TensorDataset(tensor_TestData, tensor_TestDataClassification.view(-1))
