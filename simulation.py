@@ -29,7 +29,7 @@ clear_files("./results/sr_"+str(isEnriched)
 clear_files("./results/cr_"+str(isEnriched)
                 +"_lr_"+str(LearningRate)+".csv")
 
-for NumTrainVecFields in range(20,220,20):
+for NumTrainVecFields in range(400,420,20):
     print('Running with trainning vector field size: %d ' % 
             NumTrainVecFields)
     vfc.my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,

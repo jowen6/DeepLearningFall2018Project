@@ -218,12 +218,12 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
     ########################################################################
     # 6. Output the data into csv files   <3<3<3
     
-    with open(("./results/test_sr_"+str(isEnriched)
+    with open(("./results/sr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(average_success_rate) + "\n") 
            
-    with open(("./results/test_cr_"+str(isEnriched)
+    with open(("./results/cr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(confidence_output[0])+ ", " 
