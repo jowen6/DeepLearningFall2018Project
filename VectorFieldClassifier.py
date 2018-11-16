@@ -57,9 +57,10 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
         vf.SaveFieldDataset(secondTestData,"./data/TestDataset_1.txt")
         vf.SaveFieldDataset(secondTestDataClassification,"./data/TestClassification_1.txt")
     
-    confidenfe_rate = np.zeros(4)   #stores the average condidence rate of the last batch
+    nondivfree_cr = np.zeros(NumTestVecFields)   #stores the average condidence rate of the last batch
+    divfree_cr = np.zeros(NumTestVecFields)
     average_success_rate = 0        #stores the average success rate
-    
+    confidence_output = np.zeros(4)
     for idx in range(NumSimulations):
         print("==================================================== \n")
 
@@ -179,6 +180,7 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
         
         correct = 0
         total = 0
+        testing_idx = 0
         with torch.no_grad():
             for data in FieldTestDataloader:
                 inputs, labels = data
@@ -186,13 +188,29 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
+                for i in range(4):
+                    if testing_idx+i < NumTestVecFields:
+                        divfree_cr[testing_idx+i] = outputs[i,0]
+                    else:
+                        nondivfree_cr[testing_idx-NumTestVecFields+i] = outputs[i,1]
+                           
+                testing_idx +=4
+                
         success_rate = correct / total
         print('Accuracy of the network on the test Fields: %d %%' % (
             100 * success_rate))
         
+#        print("nondivfree_cr")
+#        print(nondivfree_cr)
+#        print("divfree_cr")
+#        print(divfree_cr)        
         average_success_rate += success_rate/NumSimulations
-        confidenfe_rate += (outputs[:,0]).numpy()/NumSimulations
-                
+#        confidenfe_rate += (outputs[:,0]).numpy()/NumSimulations
+        confidence_output[0] += np.std(divfree_cr)/NumSimulations
+        confidence_output[1] += sum(divfree_cr)/NumTestVecFields/NumSimulations
+        
+        confidence_output[2] += np.std(nondivfree_cr)/NumSimulations
+        confidence_output[3] += sum(nondivfree_cr)/NumTestVecFields/NumSimulations
 #        with open(filename,"a+") as my_csv:
 #            my_csv.write(str(success_rate)+", ")
 #            my_csv.write(str((outputs[:,0]).numpy())+"\n")
@@ -200,15 +218,15 @@ def my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
     ########################################################################
     # 6. Output the data into csv files   <3<3<3
     
-    with open(("./results/sr_"+str(isEnriched)
+    with open(("./results/test_sr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
                          + str(average_success_rate) + "\n") 
            
-    with open(("./results/cr_"+str(isEnriched)
+    with open(("./results/test_cr_"+str(isEnriched)
     +"_lr_"+str(LearningRate)+".csv"),"a+") as write_data:
         write_data.write(str(NumTrainVecFields) + ", " 
-                         + str(confidenfe_rate[0])+ ", " 
-                         + str(confidenfe_rate[1])+ ", " 
-                         + str(confidenfe_rate[2])+ ", " 
-                         + str(confidenfe_rate[3]) + "\n")               
+                         + str(confidence_output[0])+ ", " 
+                         + str(confidence_output[1])+ ", " 
+                         + str(confidence_output[2])+ ", " 
+                         + str(confidence_output[3]) + "\n")               

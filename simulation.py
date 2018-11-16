@@ -12,10 +12,10 @@ True = enriched, False = not enriched.
 import VectorFieldClassifier as vfc
 import os
 
-NumSimulations = 1    #Total number of independent simulations
+NumSimulations = 40    #Total number of independent simulations
 NumTestVecFields = 60   #Size of the testing set
 LearningRate = 0.001    #learning rate in SDG
-isEnriched = True
+isEnriched = False
 
 def clear_files(filename):
     try:
@@ -29,7 +29,7 @@ clear_files("./results/sr_"+str(isEnriched)
 clear_files("./results/cr_"+str(isEnriched)
                 +"_lr_"+str(LearningRate)+".csv")
 
-for NumTrainVecFields in range(10,310,10):
+for NumTrainVecFields in range(20,220,20):
     print('Running with trainning vector field size: %d ' % 
             NumTrainVecFields)
     vfc.my_classifier(NumTrainVecFields, NumTestVecFields, NumSimulations,
