@@ -24,14 +24,16 @@ import torch
 import VFields as vf
 import torch.utils.data as utils
 
-#Number of each type of vector field (make divisible by 2)
-NumTrainVecFields = 500 #Will create twice this number of samples 
-NumTestVecFields = 200   #Will create twice this number of samples
 
-"""
 #Generating vector fields
-TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumTrainVecFields)
-TestData, TestDataClassification = vf.GenerateFieldDataset(NumTestVecFields)
+TrainData, TrainDataClassification = vf.GenerateFieldDataset(NumberOfNonDivFreeFam1 = 1000, 
+                                                             NumberOfDivFreeFam1 = 1000)
+TestData, TestDataClassification = vf.GenerateFieldDataset(NumberOfNonDivFreeFam1 = 60, 
+                                                           NumberOfNonDivFreeFam2 = 60, 
+                                                           NumberOfDivFreeFam1 = 60, 
+                                                           NumberOfDivFreeFam2 = 60,
+                                                           NumberOfDivFreeFam3 = 0,
+                                                           NumberOfDivFreeFam4 = 60)
 
 
 #Saving Data
@@ -40,15 +42,15 @@ vf.SaveFieldDataset(TrainDataClassification,"TrainClassification_1.txt")
 
 vf.SaveFieldDataset(TestData,"TestDataset_1.txt")
 vf.SaveFieldDataset(TestDataClassification,"TestClassification_1.txt")
-"""
 
+"""
 #Load Data if available
 TrainData = vf.LoadFieldDataset("TrainDataset_1.txt")
 TrainDataClassification = vf.LoadFieldDataset("TrainClassification_1.txt")
 
 TestData = vf.LoadFieldDataset("TestDataset_1.txt")
 TestDataClassification = vf.LoadFieldDataset("TestClassification_1.txt")
-
+"""
 
 #Transform to torch tensors
 tensor_TrainData = torch.stack([torch.Tensor(i) for i in TrainData]) 
@@ -90,10 +92,10 @@ import torch.nn.functional as F
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
-        self.conv1 = nn.Conv2d(2, 6, 10) #2 inputs, 6 outputs, 5x5 convolution window
+        self.conv1 = nn.Conv2d(2, 6, 5) #2 inputs, 6 outputs, 5x5 convolution window
         self.pool = nn.MaxPool2d(2, 2)  #2x2 non-overlapping window that takes max in window
-        self.conv2 = nn.Conv2d(6, 16, 10)    #6 inputs, 16 outputs, 5x5 convolution window
-        self.fc1 = nn.Linear(16 * 9 * 9, 120) #16*5*5 inputs, 120 outputs
+        self.conv2 = nn.Conv2d(6, 16, 5)    #6 inputs, 16 outputs, 5x5 convolution window
+        self.fc1 = nn.Linear(16 * 13 * 13, 120) #16*5*5 inputs, 120 outputs
         self.fc2 = nn.Linear(120, 84)   #120 inputs, 84 outputs
         self.fc3 = nn.Linear(84, 2)    #84 inputs, 10 outputs
 
@@ -101,7 +103,7 @@ class Net(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))    #Convolution->ReLU->Pooling
         x = self.pool(F.relu(self.conv2(x)))    #Convolution->ReLU->Pooling
         #print(x.size())
-        x = x.view(-1, 16 * 9 * 9)  #Convert all 2D arrays to 1D arrays
+        x = x.view(-1, 16 * 13 * 13)  #Convert all 2D arrays to 1D arrays
         x = F.relu(self.fc1(x))     #New layer
         x = F.relu(self.fc2(x))     #New layer
         x = self.fc3(x)             #Output layer
@@ -146,12 +148,6 @@ for epoch in range(6):  # loop over the dataset multiple times
         loss.backward()
         optimizer.step()
 
-        # print statistics
-        running_loss += loss.item()
-        if i % 2000 == 1999:    # print every 2000 mini-batches
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / 2000))
-            running_loss = 0.0
 
 print('Finished Training')
 
